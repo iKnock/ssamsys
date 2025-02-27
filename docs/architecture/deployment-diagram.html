@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0066cc;
+        }
+        .mermaid {
+            margin: 30px 0;
+        }
+        .content {
+            margin-top: 30px;
+        }
+        .diagram-container {
+            overflow: auto;
+            max-height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Deployment Diagram</h1>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+graph TB
+    subgraph "Development Environment"
+        A1[Developer Workstation]
+        A2[Git Repository]
+        A3[CI/CD Trigger]
+        
+        A1 -->|git push| A2
+        A2 -->|webhook| A3
+    end
+    
+    subgraph "AWS Cloud"
+        subgraph "CI/CD Pipeline"
+            B1[AWS CodePipeline]
+            B2[Source Stage]
+            B3[Build Stage]
+            B4[Test Stage]
+            B5[Deploy Stage]
+            
+            B1 --> B2
+            B2 --> B3
+            B3 --> B4
+            B4 --> B5
+        end
+        
+        subgraph "Frontend Deployment"
+            C1[S3 Bucket]
+            C2[CloudFront Distribution]
+            C3[Route 53 DNS]
+            C4[ACM Certificate]
+            
+            B5 -->|deploy static assets| C1
+            C1 --> C2
+            C3 -->|DNS routing| C2
+            C4 -->|SSL/TLS| C2
+        end
+        
+        subgraph "Backend Deployment"
+            D1[API Gateway]
+            D2[Lambda Functions]
+            D3[CloudWatch Logs]
+            D4[CloudWatch Alarms]
+            
+            B5 -->|deploy serverless functions| D2
+            D1 -->|route requests| D2
+            D2 -->|log output| D3
+            D3 -->|trigger| D4
+        end
+        
+        subgraph "Database"
+            E1[DynamoDB Tables]
+            E2[DynamoDB Auto Scaling]
+            E3[DynamoDB Backups]
+            
+            D2 -->|read/write data| E1
+            E1 --> E2
+            E1 -->|scheduled backup| E3
+        end
+        
+        subgraph "Security & Authentication"
+            F1[Cognito User Pool]
+            F2[Cognito Identity Pool]
+            F3[IAM Roles]
+            F4[API Gateway Authorizers]
+            
+            C2 -->|authenticate users| F1
+            F1 -->|federated identities| F2
+            F2 -->|assume| F3
+            F4 -->|validate tokens| F1
+            D1 -->|authorize requests| F4
+            F3 -->|grant permissions| D2
+            F3 -->|grant permissions| E1
+        end
+        
+        subgraph "Monitoring & Operations"
+            G1[CloudWatch Dashboard]
+            G2[X-Ray Tracing]
+            G3[SNS Notifications]
+            
+            D2 -->|trace requests| G2
+            D3 -->|metrics| G1
+            D4 -->|alert| G3
+            E1 -->|metrics| G1
+            C2 -->|metrics| G1
+        end
+    end
+    
+    subgraph "End Users"
+        H1[Web Browser]
+        H2[Mobile Browser]
+        
+        H1 -->|HTTPS requests| C2
+        H2 -->|HTTPS requests| C2
+        C2 -->|serve content| H1
+        C2 -->|serve content| H2
+        H1 -->|API calls| D1
+        H2 -->|API calls| D1
+    end
+    
+    style A1 fill:#f9f9f9,stroke:#333,stroke-width:1px
+    style A2 fill:#333333,stroke:#333,stroke-width:1px,color:white
+    style A3 fill:#333333,stroke:#333,stroke-width:1px,color:white
+    
+    style B1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style B2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style B3 fill:#FF9900,stroke:#333,stroke-width:1px
+    style B4 fill:#FF9900,stroke:#333,stroke-width:1px
+    style B5 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style C1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style C2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style C3 fill:#FF9900,stroke:#333,stroke-width:1px
+    style C4 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style D1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style D2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style D3 fill:#FF9900,stroke:#333,stroke-width:1px
+    style D4 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style E1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style E2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style E3 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style F1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style F2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style F3 fill:#FF9900,stroke:#333,stroke-width:1px
+    style F4 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style G1 fill:#FF9900,stroke:#333,stroke-width:1px
+    style G2 fill:#FF9900,stroke:#333,stroke-width:1px
+    style G3 fill:#FF9900,stroke:#333,stroke-width:1px
+    
+    style H1 fill:#f9f9f9,stroke:#333,stroke-width:1px
+    style H2 fill:#f9f9f9,stroke:#333,stroke-width:1px
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Deployment Diagram</h2>
+
+        <p>This diagram illustrates the AWS serverless deployment setup for our application, showing how all components are deployed and interact in the cloud environment.</p>
+
+        <h3>Development Environment</h3>
+        <ul>
+            <li><strong>Developer Workstation</strong>: Local development environment</li>
+            <li><strong>Git Repository</strong>: Source code version control (GitHub, GitLab, etc.)</li>
+            <li><strong>CI/CD Trigger</strong>: Webhook that initiates the deployment pipeline</li>
+        </ul>
+
+        <h3>AWS Cloud Infrastructure</h3>
+
+        <h4>CI/CD Pipeline</h4>
+        <ul>
+            <li><strong>AWS CodePipeline</strong>: Orchestrates the deployment workflow</li>
+            <li><strong>Source Stage</strong>: Pulls code from the repository</li>
+            <li><strong>Build Stage</strong>: Compiles and bundles the application</li>
+            <li><strong>Test Stage</strong>: Runs automated tests</li>
+            <li><strong>Deploy Stage</strong>: Deploys to production environment</li>
+        </ul>
+
+        <h4>Frontend Deployment</h4>
+        <ul>
+            <li><strong>S3 Bucket</strong>: Hosts static Angular assets</li>
+            <li><strong>CloudFront Distribution</strong>: CDN for global content delivery</li>
+            <li><strong>Route 53 DNS</strong>: Domain name management</li>
+            <li><strong>ACM Certificate</strong>: SSL/TLS certificate for HTTPS</li>
+        </ul>
+
+        <h4>Backend Deployment</h4>
+        <ul>
+            <li><strong>API Gateway</strong>: RESTful API endpoint management</li>
+            <li><strong>Lambda Functions</strong>: Serverless compute for Express.js API</li>
+            <li><strong>CloudWatch Logs</strong>: Captures application logs</li>
+            <li><strong>CloudWatch Alarms</strong>: Monitors for issues and anomalies</li>
+        </ul>
+
+        <h4>Database</h4>
+        <ul>
+            <li><strong>DynamoDB Tables</strong>: NoSQL data storage</li>
+            <li><strong>DynamoDB Auto Scaling</strong>: Automatic capacity adjustment</li>
+            <li><strong>DynamoDB Backups</strong>: Point-in-time recovery</li>
+        </ul>
+
+        <h4>Security & Authentication</h4>
+        <ul>
+            <li><strong>Cognito User Pool</strong>: User directory and authentication</li>
+            <li><strong>Cognito Identity Pool</strong>: Federated identity management</li>
+            <li><strong>IAM Roles</strong>: Fine-grained access control</li>
+            <li><strong>API Gateway Authorizers</strong>: JWT token validation</li>
+        </ul>
+
+        <h4>Monitoring & Operations</h4>
+        <ul>
+            <li><strong>CloudWatch Dashboard</strong>: Centralized monitoring</li>
+            <li><strong>X-Ray Tracing</strong>: Request tracing and performance analysis</li>
+            <li><strong>SNS Notifications</strong>: Alerts and notifications</li>
+        </ul>
+
+        <h3>End Users</h3>
+        <ul>
+            <li><strong>Web Browser</strong>: Desktop access</li>
+            <li><strong>Mobile Browser</strong>: Mobile access</li>
+        </ul>
+
+        <p>This serverless architecture provides several benefits:</p>
+        <ol>
+            <li><strong>Scalability</strong>: Automatic scaling based on demand</li>
+            <li><strong>Cost-Efficiency</strong>: Pay only for resources used</li>
+            <li><strong>Reliability</strong>: High availability across multiple AWS availability zones</li>
+            <li><strong>Security</strong>: Comprehensive security controls at multiple levels</li>
+            <li><strong>DevOps Integration</strong>: Streamlined CI/CD pipeline</li>
+            <li><strong>Reduced Operational Overhead</strong>: No server management required</li>
+        </ol>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            fontFamily: 'Arial',
+        });
+    </script>
+</body>
+</html>

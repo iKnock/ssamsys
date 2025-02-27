@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Diagrams</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0066cc;
+        }
+        .diagram-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .diagram-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .diagram-card h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .diagram-card p {
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0055aa;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Angular + Node.js/Express AWS Serverless Architecture</h1>
+    
+    <p>This directory contains architectural diagrams for a full-stack web application built with Angular for the frontend and Node.js with Express.js for the backend. The system uses AWS DynamoDB as the database and is deployed using AWS Serverless services.</p>
+    
+    <div class="diagram-card">
+        <h2>Overall Architecture Diagram</h2>
+        <p>Shows the complete system architecture including all major components and their interactions between the client, AWS services, and your application components.</p>
+        <a href="./overall-architecture.html" class="btn">View Diagram</a>
+    </div>
+    
+    <div class="diagram-card">
+        <h2>Component Diagram</h2>
+        <p>Breaks down the application into key components, showing the internal structure of both frontend and backend, including UI components, services, state management, API routes, controllers, and data access layers.</p>
+        <a href="./component-diagram.html" class="btn">View Diagram</a>
+    </div>
+    
+    <div class="diagram-card">
+        <h2>Deployment Diagram</h2>
+        <p>Illustrates the AWS serverless deployment infrastructure, including CI/CD pipeline, frontend hosting, backend services, database, security, and monitoring components.</p>
+        <a href="./deployment-diagram.html" class="btn">View Diagram</a>
+    </div>
+    
+    <h2>Architecture Overview</h2>
+    
+    <p>This architecture follows modern best practices for cloud-native applications:</p>
+    
+    <ul>
+        <li><strong>Serverless First</strong>: Eliminates server management and scales automatically</li>
+        <li><strong>Microservices Approach</strong>: Decoupled components with clear responsibilities</li>
+        <li><strong>Infrastructure as Code</strong>: Entire infrastructure can be defined and deployed via code</li>
+        <li><strong>CI/CD Integration</strong>: Automated testing and deployment pipeline</li>
+        <li><strong>Security by Design</strong>: Authentication, authorization, and encryption at multiple levels</li>
+    </ul>
+    
+    <h2>Key AWS Services Used</h2>
+    
+    <ul>
+        <li><strong>Frontend</strong>: S3, CloudFront, Route 53, ACM</li>
+        <li><strong>API Layer</strong>: API Gateway, Lambda</li>
+        <li><strong>Backend</strong>: Lambda, Express.js</li>
+        <li><strong>Database</strong>: DynamoDB</li>
+        <li><strong>Authentication</strong>: Cognito</li>
+        <li><strong>CI/CD</strong>: CodePipeline, CodeBuild</li>
+        <li><strong>Monitoring</strong>: CloudWatch, X-Ray</li>
+    </ul>
+    
+    <h2>Benefits of This Architecture</h2>
+    
+    <ol>
+        <li><strong>Scalability</strong>: Automatically scales based on demand</li>
+        <li><strong>Cost Efficiency</strong>: Pay-per-use model with no idle resources</li>
+        <li><strong>High Availability</strong>: Distributed across multiple availability zones</li>
+        <li><strong>Security</strong>: Comprehensive security at all layers</li>
+        <li><strong>Developer Productivity</strong>: Focus on code, not infrastructure</li>
+        <li><strong>Operational Excellence</strong>: Reduced operational overhead</li>
+    </ol>
+    
+    <div class="footer">
+        <p>Created for Baby Clothing Store Management System</p>
+    </div>
+</body>
+</html>

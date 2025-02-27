@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Detailed Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .mermaid-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+        .section {
+            background-color: #f9f9f9;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .nav {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 250px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            display: block;
+            margin: 10px 0;
+            color: #0066cc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav a:hover {
+            color: #004080;
+            text-decoration: underline;
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .module-card {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .module-card h3 {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .module-card ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .module-card ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .module-card ul li:last-child {
+            border-bottom: none;
+        }
+        @media (min-width: 1600px) {
+            body {
+                display: flex;
+                max-width: 1600px;
+            }
+            .nav {
+                margin-right: 30px;
+            }
+            .container {
+                flex-grow: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <h3>Navigation</h3>
+        <a href="#architecture-diagram">Architecture Diagram</a>
+        <a href="#user-interaction">User Interaction</a>
+        <a href="#angular-core">Angular Core</a>
+        <a href="#feature-modules">Feature Modules</a>
+        <a href="#core-components">Core Components</a>
+        <a href="#state-management">State Management</a>
+        <a href="#data-flow">Data Flow</a>
+    </nav>
+
+    <div class="container">
+        <h1>Frontend Detailed Architecture</h1>
+
+        <section id="architecture-diagram" class="section">
+            <h2>Architecture Diagram</h2>
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    graph TB
+                    %% Main Application Structure
+                    subgraph "Angular Application"
+                        A1[App Module]
+                        A2[App Routing]
+                        
+                        %% Core Components
+                        subgraph "Core Components"
+                            B1[Dashboard]
+                            B2[Sidebar Navigation]
+                            B3[Header]
+                            B4[Footer]
+                        end
+                        
+                        %% Feature Modules
+                        subgraph "Feature Modules"
+                            C1[Products Module]
+                            C2[Inventory Module]
+                            C3[Sales Module]
+                            C4[Customers Module]
+                            C5[Reports Module]
+                            C6[User Management]
+                        end
+                        
+                        %% Services
+                        subgraph "Services"
+                            D1[Products Service]
+                            D2[Inventory Service]
+                            D3[Sales Service]
+                            D4[Customers Service]
+                            D5[Reports Service]
+                            D6[Authentication Service]
+                        end
+                        
+                        %% Components within Modules
+                        subgraph "Product Components"
+                            E1[Product List]
+                            E2[Product Details]
+                            E3[Product Form]
+                        end
+                        
+                        subgraph "Inventory Components"
+                            F1[Stock Levels]
+                            F2[Stock Adjustments]
+                            F3[Warehouse Management]
+                        end
+                        
+                        subgraph "Sales Components"
+                            G1[Sales Dashboard]
+                            G2[New Sale]
+                            G3[Sales History]
+                            G4[Returns Processing]
+                        end
+                        
+                        subgraph "Customer Components"
+                            H1[Customer List]
+                            H2[Customer Details]
+                            H3[Customer Form]
+                        end
+                        
+                        subgraph "Reports Components"
+                            I1[Sales Reports]
+                            I2[Inventory Reports]
+                            I3[Customer Reports]
+                            I4[Financial Reports]
+                        end
+                        
+                        %% State Management
+                        subgraph "State Management"
+                            J1[NgRx Store]
+                            J2[Actions]
+                            J3[Reducers]
+                            J4[Effects]
+                        end
+                        
+                        %% Connections
+                        A1 --> A2
+                        A1 --> B1
+                        A1 --> B2
+                        A1 --> B3
+                        A1 --> B4
+                        
+                        A2 --> C1
+                        A2 --> C2
+                        A2 --> C3
+                        A2 --> C4
+                        A2 --> C5
+                        A2 --> C6
+                        
+                        C1 --> E1
+                        C1 --> E2
+                        C1 --> E3
+                        
+                        C2 --> F1
+                        C2 --> F2
+                        C2 --> F3
+                        
+                        C3 --> G1
+                        C3 --> G2
+                        C3 --> G3
+                        C3 --> G4
+                        
+                        C4 --> H1
+                        C4 --> H2
+                        C4 --> H3
+                        
+                        C5 --> I1
+                        C5 --> I2
+                        C5 --> I3
+                        C5 --> I4
+                        
+                        C1 --> D1
+                        C2 --> D2
+                        C3 --> D3
+                        C4 --> D4
+                        C5 --> D5
+                        
+                        D1 --> J1
+                        D2 --> J1
+                        D3 --> J1
+                        D4 --> J1
+                        D5 --> J1
+                        
+                        J1 --> J2
+                        J2 --> J3
+                        J3 --> J1
+                        J2 --> J4
+                        J4 --> J1
+                    end
+                </div>
+            </div>
+        </section>
+
+        <section id="user-interaction" class="section">
+            <h2>User Interaction</h2>
+            <p>The frontend is designed to provide a seamless and intuitive user experience across different devices and roles. Key interaction points include:</p>
+            <ul>
+                <li>Responsive web interface accessible via modern browsers</li>
+                <li>Role-based access control</li>
+                <li>Interactive forms and data tables</li>
+                <li>Real-time data updates</li>
+            </ul>
+        </section>
+
+        <section id="angular-core" class="section">
+            <h2>Angular Core Architecture</h2>
+            <p>The application is built using Angular's modular architecture, providing a robust and scalable frontend framework:</p>
+            <ul>
+                <li><strong>App Module</strong>: Root module that bootstraps the application</li>
+                <li><strong>App Component</strong>: Root component hosting all other components</li>
+                <li><strong>App Routing Module</strong>: Manages navigation between different views</li>
+                <li><strong>Shared Module</strong>: Contains reusable components, directives, and pipes</li>
+            </ul>
+        </section>
+
+        <section id="feature-modules" class="section">
+            <h2>Feature Modules</h2>
+            <p>The application is organized into comprehensive domain-specific feature modules:</p>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3>Products Module</h3>
+                    <ul>
+                        <li>Product List</li>
+                        <li>Product Details</li>
+                        <li>Product Management Form</li>
+                        <li>Category Management</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>Inventory Module</h3>
+                    <ul>
+                        <li>Stock Levels Tracking</li>
+                        <li>Stock Adjustments</li>
+                        <li>Warehouse Management</li>
+                        <li>Inventory Alerts</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>Sales Module</h3>
+                    <ul>
+                        <li>Sales Dashboard</li>
+                        <li>New Sale Processing</li>
+                        <li>Sales History</li>
+                        <li>Returns Management</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>Customers Module</h3>
+                    <ul>
+                        <li>Customer List</li>
+                        <li>Customer Details</li>
+                        <li>Customer Registration</li>
+                        <li>Customer Interactions</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>Reports Module</h3>
+                    <ul>
+                        <li>Sales Reports</li>
+                        <li>Inventory Reports</li>
+                        <li>Customer Reports</li>
+                        <li>Financial Reports</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>User Management</h3>
+                    <ul>
+                        <li>User Authentication</li>
+                        <li>Role Management</li>
+                        <li>Permissions Control</li>
+                        <li>Profile Management</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="core-components" class="section">
+            <h2>Core Components</h2>
+            <p>Essential UI components that provide consistent layout and navigation:</p>
+            <ul>
+                <li><strong>Sidebar Component</strong>: Main navigation menu</li>
+                <li><strong>Header Component</strong>: Top navigation and user info</li>
+                <li><strong>Footer Component</strong>: Application footer</li>
+                <li><strong>Dashboard Component</strong>: Landing page with key metrics</li>
+            </ul>
+        </section>
+
+        <section id="state-management" class="section">
+            <h2>State Management (NgRx)</h2>
+            <p>Centralized state management using NgRx for predictable state changes:</p>
+            <ul>
+                <li><strong>Store</strong>: Central state container</li>
+                <li><strong>Actions</strong>: Events that trigger state changes</li>
+                <li><strong>Reducers</strong>: Pure functions updating state</li>
+                <li><strong>Effects</strong>: Handle side effects like API calls</li>
+                <li><strong>Selectors</strong>: Extract specific state pieces</li>
+            </ul>
+        </section>
+
+        <section id="data-flow" class="section">
+            <h2>Data Flow</h2>
+            <p>Typical data flow in the application:</p>
+            <ol>
+                <li>User Input</li>
+                <li>Component Logic Processing</li>
+                <li>Service Method Invocation</li>
+                <li>HTTP API Request</li>
+                <li>Backend Response</li>
+                <li>State Update</li>
+                <li>UI Reflection</li>
+            </ol>
+        </section>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation links
+            const navLinks = document.querySelectorAll('.nav a');
+            
+            // Get all sections
+            const sections = document.querySelectorAll('.section');
+            
+            // Function to show a specific section
+            function showSection(targetSection) {
+                // Remove active class from all sections
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    section.style.display = 'none';
+                });
+                
+                // Show and activate the target section
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    // Use setTimeout to ensure display is set before adding active class
+                    setTimeout(() => {
+                        targetSection.classList.add('active');
+                    }, 10);
+                    
+                    // Smooth scroll to the section
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            }
+            
+            // Show the first section by default
+            showSection(sections[0]);
+            
+            // Add click event to navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Get the target section ID
+                    const targetId = this.getAttribute('href').substring(1);
+                    
+                    // Find and show the target section
+                    const targetSection = document.getElementById(targetId);
+                    showSection(targetSection);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

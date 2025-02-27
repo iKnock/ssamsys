@@ -1,0 +1,16 @@
+{
+  "name": "stock-management-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "seed:users": "ts-node src/scripts/seed-users.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "bcrypt": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^4.9.5"
+  }
+}
