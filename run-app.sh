@@ -78,13 +78,17 @@ sleep 5
 # Seed the database
 echo ""
 echo "Seeding database..."
+cd "$BASE_DIR/backend"
 npm run dynamodb:seed
+cd "$BASE_DIR"
 
 # Start the backend server
 echo ""
 echo "Starting backend server..."
+cd "$BASE_DIR/backend"
 npm run dev &
 BACKEND_PID=$!
+cd "$BASE_DIR"
 
 # Check if backend started successfully
 sleep 2
