@@ -9,6 +9,9 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// Import DB setup
+const { setupDynamoDBTables } = require('./config/db.setup');
+
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
@@ -24,6 +27,12 @@ const reportRoutes = require('./routes/report.routes');
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(helmet());
+app.use(morgan('combined'));
+app.use(express.json());
 
 // Swagger configuration
 const swaggerOptions = {
@@ -50,20 +59,13 @@ const swaggerOptions = {
       },
     },
   },
-  apis: [`${__dirname}/routes/*.js`], // Use absolute path to the API routes
+  apis: [
+    './routes/*.routes.js',
+  ],
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-// Middleware
-app.use(cors());
-app.use(helmet());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// API documentation route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerSpec = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -77,45 +79,33 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/reports', reportRoutes);
 
-// Root route
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Welcome to the API
- *     description: Returns a welcome message and API documentation link
- *     responses:
- *       200:
- *         description: Welcome message
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 documentation:
- *                   type: string
- */
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Baby Clothing Store Management API',
-    documentation: `${req.protocol}://${req.get('host')}/api-docs`,
-  });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    error: 'Internal Server Error',
-    message: err.message,
+    success: false,
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.stack
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Start server and setup tables
+const startServer = async () => {
+  try {
+    // Setup DynamoDB tables
+    await setupDynamoDBTables();
 
-module.exports = app; // For testing purposes
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+module.exports = app;

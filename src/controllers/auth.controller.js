@@ -1,11 +1,14 @@
-const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-const prisma = new PrismaClient();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { 
+  DynamoDBDocumentClient, 
+  GetCommand, 
+  PutCommand, 
+  ScanCommand 
+} = require('@aws-sdk/lib-dynamodb');
+const { dynamoDb, TABLES, JWT_SECRET, JWT_EXPIRES_IN } = require('../config/config');
+const { v4: uuidv4 } = require('uuid');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -23,10 +26,17 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
+    // Find user by email using scan (less efficient but works with local DynamoDB)
+    const params = {
+      TableName: TABLES.USERS,
+      FilterExpression: 'email = :email',
+      ExpressionAttributeValues: {
+        ':email': email
+      }
+    };
+
+    const { Items } = await dynamoDb.send(new ScanCommand(params));
+    const user = Items[0];
 
     if (!user) {
       return res.status(401).json({
@@ -72,12 +82,18 @@ const register = async (req, res) => {
   try {
     const { email, name, password, role = 'staff' } = req.body;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    // Check if user already exists using scan
+    const checkParams = {
+      TableName: TABLES.USERS,
+      FilterExpression: 'email = :email',
+      ExpressionAttributeValues: {
+        ':email': email
+      }
+    };
 
-    if (existingUser) {
+    const { Items: existingUsers } = await dynamoDb.send(new ScanCommand(checkParams));
+
+    if (existingUsers && existingUsers.length > 0) {
       return res.status(409).json({
         success: false,
         message: 'Email already exists'
@@ -88,14 +104,21 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        name,
-        password: hashedPassword,
-        role
-      }
-    });
+    const newUser = {
+      id: uuidv4(),
+      email,
+      name,
+      password: hashedPassword,
+      role,
+      createdAt: new Date().toISOString()
+    };
+
+    const putParams = {
+      TableName: TABLES.USERS,
+      Item: newUser
+    };
+
+    await dynamoDb.send(new PutCommand(putParams));
 
     // Generate token
     const token = generateToken(newUser);
@@ -126,16 +149,14 @@ const getProfile = async (req, res) => {
     // Assuming the user ID is attached to the request by an auth middleware
     const userId = req.user.id;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true
+    const params = {
+      TableName: TABLES.USERS,
+      Key: {
+        id: userId
       }
-    });
+    };
+
+    const { Item: user } = await dynamoDb.send(new GetCommand(params));
 
     if (!user) {
       return res.status(404).json({
@@ -144,10 +165,13 @@ const getProfile = async (req, res) => {
       });
     }
 
+    // Remove sensitive information
+    const { password, ...userProfile } = user;
+
     return res.status(200).json({
       success: true,
       message: 'User profile retrieved successfully',
-      data: user
+      data: userProfile
     });
   } catch (error) {
     console.error('Error getting user profile:', error);

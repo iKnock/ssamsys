@@ -1,413 +1,110 @@
 const { DynamoDBClient, CreateTableCommand, ListTablesCommand } = require('@aws-sdk/client-dynamodb');
-const dotenv = require('dotenv');
+const { dynamoDb, TABLES } = require('./config');
 
-// Load environment variables
-dotenv.config();
-
-// Create DynamoDB client
-const dynamoDB = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'us-east-1',
+const client = new DynamoDBClient({
+  region: 'local',
+  endpoint: 'http://localhost:8000',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: 'local',
+    secretAccessKey: 'local',
   },
 });
 
-// Table definitions
-const tables = [
-  {
-    TableName: process.env.DYNAMODB_USERS_TABLE || 'Users',
+const createTable = async (tableName, partitionKey, sortKey = null, globalSecondaryIndexes = []) => {
+  const params = {
+    TableName: tableName,
     KeySchema: [
-      { AttributeName: 'userId', KeyType: 'HASH' },
+      { AttributeName: partitionKey, KeyType: 'HASH' }
     ],
     AttributeDefinitions: [
-      { AttributeName: 'userId', AttributeType: 'S' },
-      { AttributeName: 'email', AttributeType: 'S' },
-      { AttributeName: 'role', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'EmailIndex',
-        KeySchema: [
-          { AttributeName: 'email', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'RoleIndex',
-        KeySchema: [
-          { AttributeName: 'role', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
+      { AttributeName: partitionKey, AttributeType: 'S' }
     ],
     ProvisionedThroughput: {
       ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_CUSTOMERS_TABLE || 'Customers',
-    KeySchema: [
-      { AttributeName: 'customerId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'customerId', AttributeType: 'S' },
-      { AttributeName: 'email', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'EmailIndex',
-        KeySchema: [
-          { AttributeName: 'email', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_SUPPLIERS_TABLE || 'Suppliers',
-    KeySchema: [
-      { AttributeName: 'supplierId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'supplierId', AttributeType: 'S' },
-      { AttributeName: 'email', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'EmailIndex',
-        KeySchema: [
-          { AttributeName: 'email', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_PRODUCTS_TABLE || 'Products',
-    KeySchema: [
-      { AttributeName: 'productId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'productId', AttributeType: 'S' },
-      { AttributeName: 'category', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'CategoryIndex',
-        KeySchema: [
-          { AttributeName: 'category', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_INVENTORY_TABLE || 'Inventory',
-    KeySchema: [
-      { AttributeName: 'inventoryId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'inventoryId', AttributeType: 'S' },
-      { AttributeName: 'productId', AttributeType: 'S' },
-      { AttributeName: 'stockStatus', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'ProductIndex',
-        KeySchema: [
-          { AttributeName: 'productId', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'StockStatusIndex',
-        KeySchema: [
-          { AttributeName: 'stockStatus', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_SALES_TABLE || 'Sales',
-    KeySchema: [
-      { AttributeName: 'saleId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'saleId', AttributeType: 'S' },
-      { AttributeName: 'customerId', AttributeType: 'S' },
-      { AttributeName: 'saleDate', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'CustomerIndex',
-        KeySchema: [
-          { AttributeName: 'customerId', KeyType: 'HASH' },
-          { AttributeName: 'saleDate', KeyType: 'RANGE' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'DateIndex',
-        KeySchema: [
-          { AttributeName: 'saleDate', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_SALES_DETAILS_TABLE || 'SalesDetails',
-    KeySchema: [
-      { AttributeName: 'saleDetailId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'saleDetailId', AttributeType: 'S' },
-      { AttributeName: 'saleId', AttributeType: 'S' },
-      { AttributeName: 'productId', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'SaleIndex',
-        KeySchema: [
-          { AttributeName: 'saleId', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'ProductIndex',
-        KeySchema: [
-          { AttributeName: 'productId', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_PAYMENTS_TABLE || 'Payments',
-    KeySchema: [
-      { AttributeName: 'paymentId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'paymentId', AttributeType: 'S' },
-      { AttributeName: 'saleId', AttributeType: 'S' },
-      { AttributeName: 'paymentDate', AttributeType: 'S' },
-      { AttributeName: 'paymentMethod', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'SaleIndex',
-        KeySchema: [
-          { AttributeName: 'saleId', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'DateIndex',
-        KeySchema: [
-          { AttributeName: 'paymentDate', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'MethodIndex',
-        KeySchema: [
-          { AttributeName: 'paymentMethod', KeyType: 'HASH' },
-          { AttributeName: 'paymentDate', KeyType: 'RANGE' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
-    TableName: process.env.DYNAMODB_EXPENSES_TABLE || 'Expenses',
-    KeySchema: [
-      { AttributeName: 'expenseId', KeyType: 'HASH' },
-    ],
-    AttributeDefinitions: [
-      { AttributeName: 'expenseId', AttributeType: 'S' },
-      { AttributeName: 'category', AttributeType: 'S' },
-      { AttributeName: 'expenseDate', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'CategoryIndex',
-        KeySchema: [
-          { AttributeName: 'category', KeyType: 'HASH' },
-          { AttributeName: 'expenseDate', KeyType: 'RANGE' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-      {
-        IndexName: 'DateIndex',
-        KeySchema: [
-          { AttributeName: 'expenseDate', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-];
-
-// Create tables
-const createTables = async () => {
-  try {
-    // Check existing tables
-    const { TableNames } = await dynamoDB.send(new ListTablesCommand({}));
-    
-    // Create tables that don't exist
-    for (const tableConfig of tables) {
-      if (!TableNames.includes(tableConfig.TableName)) {
-        console.log(`Creating table: ${tableConfig.TableName}`);
-        await dynamoDB.send(new CreateTableCommand(tableConfig));
-        console.log(`Table created: ${tableConfig.TableName}`);
-      } else {
-        console.log(`Table already exists: ${tableConfig.TableName}`);
-      }
+      WriteCapacityUnits: 5
     }
-    
-    console.log('All tables created or already exist');
+  };
+
+  // Add sort key if provided
+  if (sortKey) {
+    params.KeySchema.push({ AttributeName: sortKey, KeyType: 'RANGE' });
+    params.AttributeDefinitions.push({ AttributeName: sortKey, AttributeType: 'S' });
+  }
+
+  // Add global secondary indexes
+  if (globalSecondaryIndexes.length > 0) {
+    params.GlobalSecondaryIndexes = globalSecondaryIndexes.map(index => ({
+      IndexName: index.IndexName,
+      KeySchema: [
+        { AttributeName: index.PartitionKey, KeyType: 'HASH' }
+      ],
+      Projection: {
+        ProjectionType: 'ALL'
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    }));
+
+    // Add attribute definitions for GSI
+    params.AttributeDefinitions.push(
+      ...globalSecondaryIndexes.map(index => ({
+        AttributeName: index.PartitionKey,
+        AttributeType: 'S'
+      }))
+    );
+  }
+
+  try {
+    const command = new CreateTableCommand(params);
+    await client.send(command);
+    console.log(`Table ${tableName} created successfully`);
   } catch (error) {
-    console.error('Error creating tables:', error);
-    throw error;
+    console.error(`Error creating table ${tableName}:`, error);
   }
 };
 
-// Run the script if it's called directly
-if (require.main === module) {
-  createTables();
-}
+const setupDynamoDBTables = async () => {
+  try {
+    // List existing tables
+    const listTablesCommand = new ListTablesCommand({});
+    const { TableNames } = await client.send(listTablesCommand);
 
-module.exports = {
-  createTables,
+    // Create tables if they don't exist
+    const tableCreationPromises = Object.values(TABLES)
+      .filter(tableName => !TableNames.includes(tableName))
+      .map(tableName => {
+        switch(tableName) {
+          case 'Users':
+            return createTable(tableName, 'id');
+          case 'Customers':
+            return createTable(tableName, 'id');
+          case 'Suppliers':
+            return createTable(tableName, 'id');
+          case 'Products':
+            return createTable(tableName, 'id');
+          case 'Inventory':
+            return createTable(tableName, 'productId');
+          case 'Sales':
+            return createTable(tableName, 'id');
+          case 'SalesDetails':
+            return createTable(tableName, 'salesId', 'productId');
+          case 'Payments':
+            return createTable(tableName, 'id');
+          case 'Expenses':
+            return createTable(tableName, 'id');
+          default:
+            console.log(`No specific setup for table: ${tableName}`);
+            return Promise.resolve();
+        }
+      });
+
+    await Promise.all(tableCreationPromises);
+    console.log('DynamoDB local tables setup complete');
+  } catch (error) {
+    console.error('Error setting up DynamoDB tables:', error);
+  }
 };
+
+module.exports = { setupDynamoDBTables };

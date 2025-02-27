@@ -1,109 +1,55 @@
-# SSAMSys Management System
+# Baby Clothing Store Management System
 
-A complete store management solution for SSAMSys, featuring inventory management, sales processing, customer management, and reporting.
+## Local Development Setup with DynamoDB
 
-## System Architecture
+### Prerequisites
+- Docker
+- Docker Compose
+- Node.js (v16+)
+- npm
 
-This project consists of two main components:
+### Setup Steps
 
-1. **Backend**: Node.js + Express.js API with DynamoDB
-2. **Frontend**: Angular application with Material UI
-
-Detailed architecture diagrams are available in the [docs/architecture](./docs/architecture) directory:
-
-- [Overall Architecture Diagram](./docs/architecture/overall-architecture.md)
-- [Component Diagram](./docs/architecture/component-diagram.md)
-- [Deployment Diagram](./docs/architecture/deployment-diagram.md)
-
-## Prerequisites
-
-- Node.js (v14 or later)
-- npm (v6 or later)
-
-## Setup Instructions
-
-### Option 1: Using the Setup Script (Recommended)
-
-1. Run the setup script to install all dependencies:
-   ```bash
-   ./setup.sh
-   ```
-
-2. Start both the frontend and backend with a single command:
-   ```bash
-   ./run-app.sh
-   ```
-
-### Option 2: Manual Setup
-
-#### Backend Setup
-
-1. Install backend dependencies:
+1. **Install Dependencies**
    ```bash
    npm install
    ```
 
-2. Start the backend server:
+2. **Start Local DynamoDB**
+   ```bash
+   npm run dynamodb:start
+   ```
+   This will start DynamoDB Local and DynamoDB Admin UI:
+   - DynamoDB: http://localhost:8000
+   - DynamoDB Admin: http://localhost:8001
+
+3. **Seed Initial Data**
+   ```bash
+   npm run dynamodb:seed
+   ```
+
+4. **Run the Application**
    ```bash
    npm run dev
    ```
 
-#### Frontend Setup
+### Available Scripts
+- `npm run dynamodb:start`: Start local DynamoDB
+- `npm run dynamodb:stop`: Stop local DynamoDB
+- `npm run dynamodb:seed`: Seed initial database data
+- `npm run start`: Start the application
+- `npm run dev`: Start the application in development mode
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
+### Default User Credentials
+- Admin: 
+  - Email: admin@stockmgt.com
+  - Password: AdminPass123!
+- Manager:
+  - Email: manager@stockmgt.com
+  - Password: ManagerPass123!
+- Staff:
+  - Email: staff@stockmgt.com
+  - Password: StaffPass123!
 
-2. Install frontend dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Install Angular Material:
-   ```bash
-   npx ng add @angular/material
-   ```
-
-4. Start the frontend development server:
-   ```bash
-   npm start
-   ```
-
-## Accessing the Application
-
-- **Frontend**: http://localhost:4200
-- **Backend API**: http://localhost:3000/api
-- **API Documentation**: http://localhost:3000/api-docs
-
-## Features
-
-- **Authentication & Authorization**: JWT-based authentication with role-based access control
-- **User Management**: Create and manage user accounts with different roles
-- **Customer Management**: Track customer information and purchase history
-- **Supplier Management**: Manage supplier information and purchase orders
-- **Product Management**: Add, edit, and categorize products
-- **Inventory Management**: Track stock levels and receive alerts for low stock
-- **Sales Processing**: Create and manage sales transactions
-- **Payment Tracking**: Record and track payments
-- **Expense Management**: Track and categorize business expenses
-- **Reporting & Analytics**: Generate reports on sales, inventory, and finances
-
-## Project Structure
-
-- **/src**: Backend source code
-  - **/config**: Configuration files
-  - **/controllers**: API controllers
-  - **/middlewares**: Express middlewares
-  - **/models**: Data models
-  - **/routes**: API routes
-  - **/utils**: Utility functions
-- **/frontend**: Angular frontend application
-  - **/src/app**: Angular components and modules
-    - **/core**: Core services, guards, and interceptors
-    - **/shared**: Shared components, directives, and pipes
-    - **/features**: Feature modules (dashboard, products, etc.)
-
-## License
-
-This project is licensed under the ISC License.
+### API Documentation
+Access Swagger UI at: http://localhost:3000/api-docs
