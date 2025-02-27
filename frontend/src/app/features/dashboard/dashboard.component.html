@@ -1,0 +1,31 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Dashboard</h1>
+  
+  <div class="dashboard-cards">
+    <mat-card *ngFor="let card of dashboardCards" class="dashboard-card" [routerLink]="card.route">
+      <div class="card-icon" [style.background-color]="card.color">
+        <mat-icon>{{ card.icon }}</mat-icon>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">{{ card.title }}</h2>
+        <p class="card-count">{{ card.count }}</p>
+      </div>
+    </mat-card>
+  </div>
+  
+  <div class="dashboard-sections">
+    <div class="dashboard-section">
+      <h2>Recent Sales</h2>
+      <mat-card class="section-card">
+        <p class="empty-state">No recent sales data available</p>
+      </mat-card>
+    </div>
+    
+    <div class="dashboard-section">
+      <h2>Low Stock Items</h2>
+      <mat-card class="section-card">
+        <p class="empty-state">No low stock items found</p>
+      </mat-card>
+    </div>
+  </div>
+</div>
