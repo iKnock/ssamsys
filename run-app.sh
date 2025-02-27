@@ -32,13 +32,13 @@ cleanup() {
   
   # Kill the backend process if it exists
   if [ -n "$BACKEND_PID" ]; then
-    kill $BACKEND_PID 2>/dev/null || true
+    sudo kill $BACKEND_PID 2>/dev/null || true
     echo "Backend server stopped."
   fi
   
   # Kill the frontend process if it exists
   if [ -n "$FRONTEND_PID" ]; then
-    kill $FRONTEND_PID 2>/dev/null || true
+    sudo kill $FRONTEND_PID 2>/dev/null || true
     echo "Frontend server stopped."
   fi
   
@@ -52,12 +52,12 @@ trap cleanup INT TERM EXIT
 # Start the backend server
 echo ""
 echo "Starting backend server..."
-node "$BASE_DIR/src/server.js" &
+sudo node "$BASE_DIR/src/server.js" &
 BACKEND_PID=$!
 
 # Check if backend started successfully
 sleep 2
-if ! kill -0 $BACKEND_PID 2>/dev/null; then
+if ! sudo kill -0 $BACKEND_PID 2>/dev/null; then
   echo "Error: Failed to start backend server."
   exit 1
 fi
@@ -68,14 +68,14 @@ echo "Backend server running on http://localhost:3000"
 echo ""
 echo "Starting frontend server..."
 cd "$BASE_DIR/frontend"
-npx ng serve --open &
+sudo npx ng serve --open &
 FRONTEND_PID=$!
 
 # Check if frontend started successfully
 sleep 5
-if ! kill -0 $FRONTEND_PID 2>/dev/null; then
+if ! sudo kill -0 $FRONTEND_PID 2>/dev/null; then
   echo "Error: Failed to start frontend server."
-  kill $BACKEND_PID
+  sudo kill $BACKEND_PID
   exit 1
 fi
 

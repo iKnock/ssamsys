@@ -40,7 +40,7 @@ fi
 echo ""
 echo "Installing frontend dependencies..."
 cd "$BASE_DIR/frontend"
-npm install
+npm install --legacy-peer-deps
 
 # Check if frontend dependencies installed successfully
 if [ $? -ne 0 ]; then
