@@ -1,6 +1,6 @@
-# Baby Clothing Store Management System
+# SSAMSys Management System
 
-A complete store management solution for baby clothing stores, featuring inventory management, sales processing, customer management, and reporting.
+A complete store management solution for SSAMSys, featuring inventory management, sales processing, customer management, and reporting.
 
 ## System Architecture
 
